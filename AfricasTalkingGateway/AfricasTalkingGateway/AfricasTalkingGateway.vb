@@ -296,13 +296,11 @@ Partial Public Class AfricasTalkingGateway
 
     Private Function PostAsJson(ByVal dataMap As CheckoutData, ByVal url As String) As String
         Dim client = New HttpClient()
-        Dim contentPost As HttpContent = New StringContent(dataMap, Encoding.UTF8, "application/json")
-
+        Dim contentPost As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
         ' Complex object
         client.DefaultRequestHeaders.Add("apiKey", _apikey)
-        Dim result = client.PostAsync(url, dataMap).Result
+        Dim result = client.PostAsync(url, contentPost).Result
         result.EnsureSuccessStatusCode()
-
         Dim stringResult = result.Content.ReadAsStringAsync().Result
         Return stringResult
     End Function
@@ -324,13 +322,13 @@ Partial Public Class AfricasTalkingGateway
             Throw New AfricasTalkingGatewayException("There was a problem processing Mobile Checkout: " & checkoutException.Message)
         End Try
     End Function
-    Public Function PostB2BJson(ByVal dataMap As B2BData, ByVal url As String) As String
+
+    Private Function PostB2BJson(ByVal dataMap As B2BData, ByVal url As String) As String
         Dim client = New HttpClient()
-
+        Dim serializedB2B As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
         client.DefaultRequestHeaders.Add("apiKey", _apikey)
-        Dim result = client.PostAsJsonAsync(Of B2BData)(url, dataMap).Result
+        Dim result = client.PostAsync(url, serializedB2B).Result
         result.EnsureSuccessStatusCode()
-
         Dim stringResult As String = result.Content.ReadAsStringAsync().Result
         Return stringResult
 
@@ -364,13 +362,14 @@ Partial Public Class AfricasTalkingGateway
         }, Me.PaymentsB2CUrlString)
     End Function
 
-    Public Function Post(ByVal body As RequestBody, ByVal url As String) As DataResult
+    Private Function Post(ByVal body As RequestBody, ByVal url As String) As String
         Dim httpClient = New HttpClient()
+        Dim httpContent As HttpContent = New StringContent(body.ToString(), Encoding.UTF8, "application/json")
         httpClient.DefaultRequestHeaders.Add("apiKey", _apikey)
-        Dim result = httpClient.PostAsJsonAsync(url, body).Result
+        Dim result = httpClient.PostAsync(url, httpContent).Result
         result.EnsureSuccessStatusCode()
-        Dim res = result.Content.ReadAsAsync(Of DataResult)()
-        Return res.Result
+        Dim postResult As String = result.Content.ReadAsStringAsync().Result
+        Return postResult
 
     End Function
     Private Shared Function RemoteCertificateValidationCallback(ByVal sender As Object, ByVal certificate As System.Security.Cryptography.X509Certificates.X509Certificate, ByVal chain As System.Security.Cryptography.X509Certificates.X509Chain, ByVal errors As Security.SslPolicyErrors) As Boolean
