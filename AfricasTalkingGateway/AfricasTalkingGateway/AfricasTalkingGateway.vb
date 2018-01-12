@@ -32,31 +32,31 @@ Partial Public Class AfricasTalkingGateway
     Private DEBUG As Boolean = False
     Private _responseCode As Integer
 
-    Public Function SendMessage(ByVal to_ As String, ByVal message_ As String, Optional ByVal from_ As String = Nothing, Optional ByVal bulkSMSMode_ As Integer = 1, Optional ByVal options_ As Hashtable = Nothing) As Object
+    Public Function SendMessage(ByVal [to] As String, ByVal message As String, Optional ByVal recipient As String = Nothing, Optional ByVal bulkSmsMode As Integer = 1, Optional ByVal options As Hashtable = Nothing) As Object
         Dim data As New Hashtable()
         data("username") = _username
-        data("to") = to_
-        data("message") = message_
+        data("to") = [to]
+        data("message") = message
 
-        If from_ IsNot Nothing Then
-            data("from") = from_
-            data("bulkSMSMode") = Convert.ToString(bulkSMSMode_)
+        If recipient IsNot Nothing Then
+            data("from") = recipient
+            data("bulkSMSMode") = Convert.ToString(bulkSmsMode)
 
-            If options_ IsNot Nothing Then
-                If options_.Contains("keyword") Then
-                    data("keyword") = options_("keyword")
+            If options IsNot Nothing Then
+                If options.Contains("keyword") Then
+                    data("keyword") = options("keyword")
                 End If
 
-                If options_.Contains("linkId") Then
-                    data("linkId") = options_("linkId")
+                If options.Contains("linkId") Then
+                    data("linkId") = options("linkId")
                 End If
 
-                If options_.Contains("enqueue") Then
-                    data("enqueue") = options_("enqueue")
+                If options.Contains("enqueue") Then
+                    data("enqueue") = options("enqueue")
                 End If
 
-                If options_.Contains("retryDurationInHours") Then
-                    data("retryDurationInHours") = options_("retryDurationInHours")
+                If options.Contains("retryDurationInHours") Then
+                    data("retryDurationInHours") = options("retryDurationInHours")
                 End If
             End If
         End If
