@@ -173,9 +173,9 @@ Partial Public Class AfricasTalkingGateway
         Dim data = New Hashtable From {{"username", _username}, {"recipients", recipientJson}}
         Try
             If _responseCode <> CInt(Math.Truncate(HttpStatusCode.Created)) Then
-                Throw New AfricasTalkingGatewayException(SendPostRequest(dataMap_:=data, urlString_:=urlString))
+                Throw New AfricasTalkingGatewayException(SendPostRequest(dataMap:=data, urlString:=urlString))
             End If
-            Dim response As Object = JObject.Parse(SendPostRequest(dataMap_:=data, urlString_:=urlString))
+            Dim response As Object = JObject.Parse(SendPostRequest(dataMap:=data, urlString:=urlString))
             Return response
         Catch sendAirtimeException As AfricasTalkingGatewayException
             Throw New AfricasTalkingGatewayException("Sending Airtime Encountered an errror: " & sendAirtimeException.Message)
@@ -192,14 +192,14 @@ Partial Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Private Function SendPostRequest(ByVal dataMap_ As Hashtable, ByVal urlString_ As String) As String
+    Private Function SendPostRequest(ByVal dataMap As Hashtable, ByVal urlString As String) As String
         Try
             Dim dataStr As String = ""
-            For Each key As String In dataMap_.Keys
+            For Each key As String In dataMap.Keys
                 If dataStr.Length > 0 Then
                     dataStr &= "&"
                 End If
-                Dim value As String = DirectCast(dataMap_(key), String)
+                Dim value As String = DirectCast(dataMap(key), String)
                 dataStr &= HttpUtility.UrlEncode(key, Encoding.UTF8)
                 dataStr &= "=" & HttpUtility.UrlEncode(value, Encoding.UTF8)
             Next key
@@ -207,7 +207,7 @@ Partial Public Class AfricasTalkingGateway
             Dim byteArray() As Byte = Encoding.UTF8.GetBytes(dataStr)
 
             System.Net.ServicePointManager.ServerCertificateValidationCallback = AddressOf RemoteCertificateValidationCallback
-            Dim webRequest As HttpWebRequest = CType(System.Net.WebRequest.Create(urlString_), HttpWebRequest)
+            Dim webRequest As HttpWebRequest = CType(System.Net.WebRequest.Create(urlString), HttpWebRequest)
 
             webRequest.Method = "POST"
             webRequest.ContentType = "application/x-www-form-urlencoded"
