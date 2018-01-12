@@ -74,8 +74,8 @@ Partial Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Public Function FetchMessages(ByVal lastReceivedId_ As Integer) As Object
-        Dim url As String = SmsUrlString & "?username=" & _username & "&lastReceivedId=" & Convert.ToString(lastReceivedId_)
+    Public Function FetchMessages(ByVal lastReceivedId As Integer) As Object
+        Dim url As String = SmsUrlString & "?username=" & _username & "&lastReceivedId=" & Convert.ToString(lastReceivedId)
         Dim response As String = SendGetRequest(url)
         If _responseCode = CInt(HttpStatusCode.OK) Then
             Dim json As String = JsonConvert.DeserializeObject(response)
