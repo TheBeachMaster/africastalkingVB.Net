@@ -88,41 +88,43 @@ Partial Public Class AfricasTalkingGateway
         If phoneNumber.Length = 0 OrElse shortCode.Length = 0 OrElse keyword.Length = 0 Then
             Throw New AfricasTalkingGatewayException("Please supply phone number, short code and keyword")
         End If
-        Dim data_ As New Hashtable()
-        data_("username") = _username
-        data_("phoneNumber") = phoneNumber
-        data_("shortCode") = shortCode
-        data_("keyword") = keyword
-        Dim urlString As String = SubscriptionUrlString & "/create"
-        Dim response As String = SendPostRequest(data_, urlString)
-        If _responseCode = CInt(HttpStatusCode.Created) Then
-            Dim json As String = JsonConvert.DeserializeObject(Of Object)(response)
-            Return json
-        End If
-        Throw New AfricasTalkingGatewayException(response)
-    End Function
-    Public Function deleteSubscription(ByVal phoneNumber_ As String, ByVal shortCode_ As String, ByVal keyword_ As String) As Object
-        If phoneNumber_.Length = 0 OrElse shortCode_.Length = 0 OrElse keyword_.Length = 0 Then
-            Throw New AfricasTalkingGatewayException("Please supply phone number, short code and keyword")
-        End If
-        Dim data_ As New Hashtable()
-        data_("username") = _username
-        data_("phoneNumber") = phoneNumber_
-        data_("shortCode") = shortCode_
-        data_("keyword") = keyword_
-        Dim urlString As String = SubscriptionUrlString & "/delete"
-        Dim response As String = SendPostRequest(data_, urlString)
-        If _responseCode = CInt(HttpStatusCode.Created) Then
-            Dim json As String = JsonConvert.DeserializeObject(Of Object)(response)
-            Return json
-        End If
-        Throw New AfricasTalkingGatewayException(response)
-    End Function
-    Public Function [Call](ByVal from_ As String, ByVal to_ As String) As Object
         Dim data As New Hashtable()
         data("username") = _username
-        data("from") = from_
-        data("to") = to_
+        data("phoneNumber") = phoneNumber
+        data("shortCode") = shortCode
+        data("keyword") = keyword
+        Dim urlString As String = SubscriptionUrlString & "/create"
+        Dim response As String = SendPostRequest(data, urlString)
+        If _responseCode = CInt(HttpStatusCode.Created) Then
+            Dim json As String = JsonConvert.DeserializeObject(Of Object)(response)
+            Return json
+        End If
+        Throw New AfricasTalkingGatewayException(response)
+    End Function
+
+    Public Function DeleteSubscription(ByVal phoneNumber As String, ByVal shortCode As String, ByVal keyword As String) As Object
+        If phoneNumber.Length = 0 OrElse shortCode.Length = 0 OrElse keyword.Length = 0 Then
+            Throw New AfricasTalkingGatewayException("Please supply phone number, short code and keyword")
+        End If
+        Dim data As New Hashtable()
+        data("username") = _username
+        data("phoneNumber") = phoneNumber
+        data("shortCode") = shortCode
+        data("keyword") = keyword
+        Dim urlString As String = SubscriptionUrlString & "/delete"
+        Dim response As String = SendPostRequest(data, urlString)
+        If _responseCode = CInt(HttpStatusCode.Created) Then
+            Dim json As String = JsonConvert.DeserializeObject(Of Object)(response)
+            Return json
+        End If
+        Throw New AfricasTalkingGatewayException(response)
+    End Function
+
+    Public Function [Call](ByVal caller As String, ByVal [recipients] As String) As Object
+        Dim data As New Hashtable()
+        data("username") = _username
+        data("from") = caller
+        data("to") = [recipients]
         Dim urlString As String = VoiceUrlString & "/call"
         Dim response As String = SendPostRequest(data, urlString)
         Dim json As String = JsonConvert.DeserializeObject(Of Object)(response)
