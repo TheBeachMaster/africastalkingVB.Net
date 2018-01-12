@@ -145,19 +145,19 @@ Partial Public Class AfricasTalkingGateway
         Dim queuedUrl As String = VoiceUrlString & "/queueStatus"
         Try
             If _responseCode <> CInt(Math.Truncate(HttpStatusCode.Created)) Then
-                Throw New AfricasTalkingGatewayException(SendPostRequest(dataMap_:=data, urlString_:=queuedUrl))
+                Throw New AfricasTalkingGatewayException(SendPostRequest(dataMap:=data, urlString:=queuedUrl))
             End If
-            Dim response As Object = JObject.Parse(SendPostRequest(dataMap_:=data, urlString_:=queuedUrl))
+            Dim response As Object = JObject.Parse(SendPostRequest(dataMap:=data, urlString:=queuedUrl))
             Return response
         Catch getNumberOfQueuedCallsException As Exception
             Throw New AfricasTalkingGatewayException("An error was encountered when processing Queued Call Request: " & getNumberOfQueuedCallsException.Message)
         End Try
     End Function
 
-    Public Sub UploadMediaFile(ByVal url_ As String)
+    Public Sub UploadMediaFile(ByVal url As String)
         Dim data As New Hashtable()
         data("username") = _username
-        data("url") = url_
+        data("url") = url
 
         Dim urlString As String = VoiceUrlString & "/mediaUpload"
         Dim response As String = SendPostRequest(data, urlString)
