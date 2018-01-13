@@ -1,33 +1,38 @@
 ﻿Imports Newtonsoft.Json
 
-Public Class MobilePaymentB2CRecipient
-    <JsonProperty("phoneNumber")>
-    Public Property PhoneNumber() As String
+Namespace AfricasTalkingGateway
 
-    <JsonProperty("currencyCode")>
-    Public Property CurrencyCode() As String
+    Public Class MobilePaymentB2CRecipient
+        <JsonProperty("phoneNumber")>
+        Public Property PhoneNumber() As String
 
-    <JsonProperty("amount")>
-    Public Property Amount() As Decimal
+        <JsonProperty("currencyCode")>
+        Public Property CurrencyCode() As String
 
-    <JsonProperty("metadata")>
-    Public Property Metadata As Dictionary(Of String, String)
+        <JsonProperty("amount")>
+        Public Property Amount() As Decimal
 
-    Public Sub New(ByVal phoneNumber As String, ByVal currencyCode As String, ByVal amount As Decimal)
-        Me.PhoneNumber = phoneNumber
-        Me.CurrencyCode = currencyCode
-        Me.Amount = amount
-        Metadata = New Dictionary(Of String, String)()
-    End Sub
+        <JsonProperty("metadata")>
+        Public Property Metadata As Dictionary(Of String, String)
 
-    Public Sub AddMetadata(ByVal key As String, ByVal value As String)
-        Me.Metadata.Add(key, value)
-    End Sub
+        Public Sub New(ByVal phoneNumber As String, ByVal currencyCode As String, ByVal amount As Decimal)
+            Me.PhoneNumber = phoneNumber
+            Me.CurrencyCode = currencyCode
+            Me.Amount = amount
+            Metadata = New Dictionary(Of String, String)()
+        End Sub
 
-    Public Function ToJson() As String
-        Dim json = JsonConvert.SerializeObject(Me)
-        Return json
-    End Function
+        Public Sub AddMetadata(ByVal key As String, ByVal value As String)
+            Me.Metadata.Add(key, value)
+        End Sub
 
-End Class
+        Public Function ToJson() As String
+            Dim json = JsonConvert.SerializeObject(Me)
+            Return json
+        End Function
+
+    End Class
+End Namespace
+
+
 
