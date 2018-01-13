@@ -2,6 +2,28 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <PackageId>AfricasTalkingGateway.NET.VB</PackageId>
+    <Version>2.0.0</Version>
+    <Authors>TheBeachmaster</Authors>
+    <Company>Africa's Talking Ltd.</Company>
+    <Product>Africa's Talking Gateway for VB.NET</Product>
+    <Description>Africa's Talking SMS,Voice,USSD,Airtime and Payments APIs provide a scalable,robust and reliable interfacing between developers and telco providers across the continent</Description>
+    <Copyright>Copyright ©2018 Africa's Talking Ltd</Copyright>
+    <PackageLicenseUrl>https://www.africastalking.com/terms</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/AfricasTalkingLtd/africastalkingVB.Net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AfricasTalkingLtd/africastalkingVB.Net</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageIconUrl>https://avatars2.githubusercontent.com/u/12639968</PackageIconUrl>
+    <PackageTags>sms voice mobile-payments airtime card-payments bank-tranfers otp-validations</PackageTags>
+    <PackageReleaseNotes>Support for Banking
+Support for Card transactions
+B2B improvents
+B2C improvements
+Under the hood quality improvements</PackageReleaseNotes>
+    <RootNamespace>AfricasTalkingGateway</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
