@@ -1,4 +1,5 @@
 ﻿Imports Newtonsoft.Json
+
 Namespace AfricasTalkingGateway
     Public Class DataResult
         <JsonProperty("numQueued")>

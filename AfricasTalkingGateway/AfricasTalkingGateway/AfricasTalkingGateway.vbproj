@@ -24,6 +24,11 @@ B2B improvents
 B2C improvements
 Under the hood quality improvements</PackageReleaseNotes>
     <RootNamespace>AfricasTalkingGateway</RootNamespace>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>

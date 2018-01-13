@@ -1,5 +1,6 @@
 Option Infer On
 Option Strict Off
+
 Imports System.IO
 Imports System.Net
 Imports System.Net.Http
@@ -7,6 +8,7 @@ Imports System.Text
 Imports System.Web
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
+
 Namespace AfricasTalkingGateway
 
     Partial Public Class AfricasTalkingGateway
