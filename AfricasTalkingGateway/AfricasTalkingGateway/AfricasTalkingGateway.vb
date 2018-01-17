@@ -26,16 +26,6 @@ Public Class AfricasTalkingGateway
         End If
     End Sub
 
-    Private Shared Function GetDefaultAuthEnv(username As String) As String
-        Dim env As String
-        If username = "sandbox" Then
-            env = "sandbox"
-        Else
-            env = "production"
-        End If
-        Return env
-    End Function
-
     'Change the debug flag to true to view the full response
     Private DEBUG As Boolean = False
     Private _responseCode As Integer
