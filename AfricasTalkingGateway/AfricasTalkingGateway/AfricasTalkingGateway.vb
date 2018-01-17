@@ -63,11 +63,11 @@ Public Class AfricasTalkingGateway
         Dim response As String = SendPostRequest(data, SmsUrlString)
         If _responseCode = CInt(HttpStatusCode.Created) Then
             Dim json As String = JsonConvert.DeserializeObject(Of String)(response)
-            Dim recipients As String = json("SMSMessageData")
+            Dim recipients As String = json
             If recipients.Length > 0 Then
                 Return recipients
             End If
-            Throw New AfricasTalkingGatewayException(CType(json("SMSMessageData"), String))
+            Throw New AfricasTalkingGatewayException("An error ocurred during this process")
 
         End If
         Throw New AfricasTalkingGatewayException(response)
@@ -227,8 +227,10 @@ Public Class AfricasTalkingGateway
             If DEBUG Then
                 Console.WriteLine("Full response: " & response)
             End If
+            Dim jsonOutput As String
+            jsonOutput = JsonConvert.SerializeObject(response)
 
-            Return response
+            Return jsonOutput
 
         Catch ex As WebException
             If ex.Response Is Nothing Then
