@@ -2,7 +2,7 @@
 
 Public Class RequestBody
     Public Sub New()
-        Me.Recipients = New List(Of MobilePaymentB2CRecipient)()
+        Recipients = New List(Of MobilePaymentB2CRecipient)()
     End Sub
     <JsonProperty("username")>
     Public Property UserName() As String

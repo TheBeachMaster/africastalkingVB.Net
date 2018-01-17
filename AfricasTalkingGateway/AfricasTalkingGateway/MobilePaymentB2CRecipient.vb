@@ -13,7 +13,7 @@ Public Class MobilePaymentB2CRecipient
     <JsonProperty("metadata")>
     Public Property Metadata As Dictionary(Of String, String)
 
-    Public Sub New(ByVal phoneNumber As String, ByVal currencyCode As String, ByVal amount As Decimal)
+    Public Sub New(phoneNumber As String, currencyCode As String, amount As Decimal)
         Me.PhoneNumber = phoneNumber
         Me.CurrencyCode = currencyCode
         Me.Amount = amount
@@ -21,11 +21,11 @@ Public Class MobilePaymentB2CRecipient
     End Sub
 
     Public Sub AddMetadata(ByVal key As String, ByVal value As String)
-        Me.Metadata.Add(key, value)
+        Metadata.Add(key, value)
     End Sub
 
     Public Function ToJson() As String
-        Dim json = JsonConvert.SerializeObject(Me)
+        Dim json As String = JsonConvert.SerializeObject(Me)
         Return json
     End Function
 
