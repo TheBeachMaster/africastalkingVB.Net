@@ -83,7 +83,7 @@ Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Public Function CreateSubscription(ByVal phoneNumber As String, ByVal shortCode As String, ByVal keyword As String) As String
+    Public Function CreateSubscription(phoneNumber As String, shortCode As String, keyword As String) As String
         If phoneNumber.Length = 0 OrElse shortCode.Length = 0 OrElse keyword.Length = 0 Then
             Throw New AfricasTalkingGatewayException("Please supply phone number, short code and keyword")
         End If
@@ -101,7 +101,7 @@ Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Public Function DeleteSubscription(ByVal phoneNumber As String, ByVal shortCode As String, ByVal keyword As String) As String
+    Public Function DeleteSubscription(phoneNumber As String, shortCode As String, keyword As String) As String
         If phoneNumber.Length = 0 OrElse shortCode.Length = 0 OrElse keyword.Length = 0 Then
             Throw New AfricasTalkingGatewayException("Please supply phone number, short code and keyword")
         End If
@@ -119,7 +119,7 @@ Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Public Function [Call](ByVal caller As String, ByVal [recipients] As String) As String
+    Public Function [Call](caller As String, [recipients] As String) As String
         Dim data As New Hashtable()
         data("username") = _username
         data("from") = caller
@@ -133,7 +133,7 @@ Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(CType(json("errorMessage"), String))
     End Function
 
-    Public Function GetNumQueuedCalls(ByVal phoneNumber As String, Optional ByVal queueName As String = Nothing) As Integer
+    Public Function GetNumQueuedCalls(phoneNumber As String, Optional ByVal queueName As String = Nothing) As Integer
         Dim data As New Hashtable()
         data("username") = _username
         data("phoneNumbers") = phoneNumber
@@ -166,8 +166,8 @@ Public Class AfricasTalkingGateway
         End If
     End Sub
 
-    Public Function SendAirtime(ByVal recipient As ArrayList) As String
-        Dim urlString As String = Me.AirtimeUrlString & "/send"
+    Public Function SendAirtime(recipient As ArrayList) As String
+        Dim urlString As String = AirtimeUrlString & "/send"
         Dim recipientJson As String = JsonConvert.SerializeObject(recipient)
         Dim data = New Hashtable From {{"username", _username}, {"recipients", recipientJson}}
         Try
@@ -184,14 +184,14 @@ Public Class AfricasTalkingGateway
     Public Function GetUserData() As String
         Dim urlString As String = UserdataUrlString & "?username=" & _username
         Dim response As String = SendGetRequest(urlString)
-        If _responseCode = CInt(HttpStatusCode.OK) Then
+        If _responseCode = (HttpStatusCode.OK) Then
             Dim json As String = JsonConvert.DeserializeObject(Of String)(response)
             Return json("UserData")
         End If
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Private Function SendPostRequest(ByVal dataMap As Hashtable, ByVal urlString As String) As String
+    Private Function SendPostRequest(dataMap As Hashtable, urlString As String) As String
         Try
             Dim dataStr As String = ""
             For Each key As String In dataMap.Keys
@@ -205,8 +205,8 @@ Public Class AfricasTalkingGateway
 
             Dim byteArray() As Byte = Encoding.UTF8.GetBytes(dataStr)
 
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = AddressOf RemoteCertificateValidationCallback
-            Dim webRequest As HttpWebRequest = CType(System.Net.WebRequest.Create(urlString), HttpWebRequest)
+            ServicePointManager.ServerCertificateValidationCallback = AddressOf RemoteCertificateValidationCallback
+            Dim webRequest As HttpWebRequest = CType(Net.WebRequest.Create(urlString), HttpWebRequest)
 
             webRequest.Method = "POST"
             webRequest.ContentType = "application/x-www-form-urlencoded"
@@ -249,15 +249,15 @@ Public Class AfricasTalkingGateway
             End Using
 
         Catch ex As AfricasTalkingGatewayException
-            Throw ex
+            Throw
         End Try
     End Function
 
-    Private Function SendGetRequest(ByVal urlString As String) As String
+    Private Function SendGetRequest(urlString As String) As String
         Try
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = AddressOf RemoteCertificateValidationCallback
+            ServicePointManager.ServerCertificateValidationCallback = AddressOf RemoteCertificateValidationCallback
 
-            Dim webRequest As HttpWebRequest = CType(System.Net.WebRequest.Create(urlString), HttpWebRequest)
+            Dim webRequest As HttpWebRequest = CType(Net.WebRequest.Create(urlString), HttpWebRequest)
             webRequest.Method = "GET"
             webRequest.Accept = "application/json"
             webRequest.Headers.Add("apiKey", _apikey)
@@ -272,7 +272,10 @@ Public Class AfricasTalkingGateway
                 Console.WriteLine("Full response: " & response)
             End If
 
-            Return response
+            Dim jsonOutput As String
+            jsonOutput = JsonConvert.SerializeObject(response)
+
+            Return jsonOutput
 
 
         Catch ex As WebException
@@ -293,11 +296,11 @@ Public Class AfricasTalkingGateway
             End Using
 
         Catch ex As AfricasTalkingGatewayException
-            Throw ex
+            Throw
         End Try
     End Function
 
-    Private Function PostAsJson(ByVal dataMap As CheckoutData, ByVal url As String) As String
+    Private Function PostAsJson(dataMap As CheckoutData, url As String) As String
         Dim client = New HttpClient()
         Dim contentPost As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
         ' Complex object
@@ -305,10 +308,12 @@ Public Class AfricasTalkingGateway
         Dim result = client.PostAsync(url, contentPost).Result
         result.EnsureSuccessStatusCode()
         Dim stringResult = result.Content.ReadAsStringAsync().Result
-        Return stringResult
+        Dim jsonOutput As String
+        jsonOutput = JsonConvert.SerializeObject(stringResult)
+        Return jsonOutput
     End Function
 
-    Public Function InitiateMobilePaymentCheckout(ByVal productName As String, ByVal phoneNumber As String, ByVal currencyCode As String, ByVal amount As Integer, ByVal providerChannel As String, Optional _
+    Public Function InitiateMobilePaymentCheckout(productName As String, phoneNumber As String, currencyCode As String, amount As Integer, providerChannel As String, Optional _
                                                      ByVal metadata As Dictionary(Of String, String) = Nothing) As String
 
         Try
@@ -326,18 +331,20 @@ Public Class AfricasTalkingGateway
         End Try
     End Function
 
-    Private Function PostB2BJson(ByVal dataMap As B2BData, ByVal url As String) As String
+    Private Function PostB2BJson(dataMap As B2BData, url As String) As String
         Dim client = New HttpClient()
         Dim serializedB2B As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
         client.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim result = client.PostAsync(url, serializedB2B).Result
         result.EnsureSuccessStatusCode()
         Dim stringResult As String = result.Content.ReadAsStringAsync().Result
-        Return stringResult
+        Dim jsonOutput As String
+        jsonOutput = JsonConvert.SerializeObject(stringResult)
+        Return jsonOutput
 
     End Function
 
-    Public Function MobileB2B(ByVal productName As String, ByVal provider As String, ByVal transferType As String, ByVal currencyCode As String, ByVal amount As Integer, ByVal destinationChannel As String, ByVal destinationAccount As String, Optional ByVal metadata As Dictionary(Of String, String) = Nothing) As String
+    Public Function MobileB2B(productName As String, provider As String, transferType As String, currencyCode As String, amount As Integer, destinationChannel As String, destinationAccount As String, Optional ByVal metadata As Dictionary(Of String, String) = Nothing) As String
 
         Try
             Return PostB2BJson(dataMap:=New B2BData() With {
@@ -356,39 +363,42 @@ Public Class AfricasTalkingGateway
         End Try
     End Function
 
-    Public Function MobilePaymentB2CRequest(ByVal productName As String, ByVal recipients As IList(Of MobilePaymentB2CRecipient)) As String
+    Public Function MobilePaymentB2CRequest(productName As String, recipients As IList(Of MobilePaymentB2CRecipient)) As String
 
         Return Post(New RequestBody With {
             .ProductName = productName,
             .UserName = _username,
             .Recipients = recipients.ToList()
-        }, Me.PaymentsB2CUrlString)
+        }, PaymentsB2CUrlString)
     End Function
 
-    Private Function Post(ByVal body As RequestBody, ByVal url As String) As String
+    Private Function Post(body As RequestBody, url As String) As String
         Dim httpClient = New HttpClient()
         Dim httpContent As HttpContent = New StringContent(body.ToString(), Encoding.UTF8, "application/json")
         httpClient.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim result = httpClient.PostAsync(url, httpContent).Result
         result.EnsureSuccessStatusCode()
         Dim postResult As String = result.Content.ReadAsStringAsync().Result
-        Return postResult
+
+        Dim jsonOutput As String
+        jsonOutput = JsonConvert.SerializeObject(postResult)
+        Return jsonOutput
 
     End Function
 
-    Private Shared Function RemoteCertificateValidationCallback(ByVal sender As Object, ByVal certificate As System.Security.Cryptography.X509Certificates.X509Certificate, ByVal chain As System.Security.Cryptography.X509Certificates.X509Chain, ByVal errors As Security.SslPolicyErrors) As Boolean
+    Private Shared Function RemoteCertificateValidationCallback(sender As Object, certificate As System.Security.Cryptography.X509Certificates.X509Certificate, chain As System.Security.Cryptography.X509Certificates.X509Chain, errors As Security.SslPolicyErrors) As Boolean
         Return True
     End Function
 
     Private ReadOnly Property ApiHost() As String
         Get
-            Return (If(String.ReferenceEquals(_environment, "sandbox"), "https://api.sandbox.africastalking.com", "https://api.africastalking.com"))
+            Return (If(ReferenceEquals(_environment, "sandbox"), "https://api.sandbox.africastalking.com", "https://api.africastalking.com"))
         End Get
     End Property
 
     Private ReadOnly Property PaymentHost() As String
         Get
-            Return (If(String.ReferenceEquals(_environment, "sandbox"), "https://payments.sandbox.africastalking.com", "https://payments.africastalking.com"))
+            Return (If(ReferenceEquals(_environment, "sandbox"), "https://payments.sandbox.africastalking.com", "https://payments.africastalking.com"))
         End Get
 
     End Property
@@ -401,7 +411,7 @@ Public Class AfricasTalkingGateway
 
     Private ReadOnly Property VoiceUrlString() As String
         Get
-            Return (If(String.ReferenceEquals(_environment, "sandbox"), "https://voice.sandbox.africastalking.com", "https://voice.africastalking.com"))
+            Return (If(ReferenceEquals(_environment, "sandbox"), "https://voice.sandbox.africastalking.com", "https://voice.africastalking.com"))
         End Get
     End Property
 
