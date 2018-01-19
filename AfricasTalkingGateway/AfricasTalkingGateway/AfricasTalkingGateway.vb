@@ -1,9 +1,12 @@
 
 Option Strict Off
+
+Imports System.Globalization
 Imports System.IO
 Imports System.Net
 Imports System.Net.Http
 Imports System.Text
+Imports System.Text.RegularExpressions
 Imports System.Web
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
@@ -191,6 +194,113 @@ Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
+    ' Payments Section
+
+    Public Function InitiateMobilePaymentCheckout(productName As String, phoneNumber As String, currencyCode As String, amount As Integer, providerChannel As String, Optional _
+                                                     ByVal metadata As Dictionary(Of String, String) = Nothing) As String
+
+        Try
+            Return PostAsJson(New CheckoutData() With {
+            .Username = _username,
+            .ProductName = productName,
+            .PhoneNumber = phoneNumber,
+            .CurrencyCode = currencyCode,
+            .Amount = amount,
+            .ProviderChannel = providerChannel,
+            .Metadata = metadata
+        }, PaymentsUrlString)
+        Catch checkoutException As Exception
+            Throw New AfricasTalkingGatewayException("There was a problem processing Mobile Checkout: " & checkoutException.Message)
+        End Try
+    End Function
+
+    Public Function MobileB2B(productName As String, provider As String, transferType As String, currencyCode As String, amount As Integer, destinationChannel As String, destinationAccount As String, Optional ByVal metadata As Dictionary(Of String, String) = Nothing) As String
+
+        Try
+            Return PostB2BJson(dataMap:=New B2BData() With {
+            .Username = _username,
+            .ProductName = productName,
+            .Provider = provider,
+            .TransferType = transferType,
+            .CurrencyCode = currencyCode,
+            .Amount = amount,
+            .DestinationChannel = destinationChannel,
+            .DestinationAccount = destinationAccount,
+            .Metadata = metadata
+        }, url:=PaymentsB2BUrlString)
+        Catch mobileB2BException As Exception
+            Throw New AfricasTalkingGatewayException("There was a problem processing Mobile B2B Request: " & mobileB2BException.Message)
+        End Try
+    End Function
+
+    Public Function MobilePaymentB2CRequest(productName As String, recipients As IList(Of MobilePaymentB2CRecipient)) As String
+
+        Return Post(New RequestBody With {
+            .ProductName = productName,
+            .UserName = _username,
+            .Recipients = recipients.ToList()
+        }, PaymentsB2CUrlString)
+    End Function
+
+
+
+
+    ' End Payments Section
+
+    ' Regex and Validators
+
+    Private Shared Function IsPhoneNumber(number As String) As Boolean
+        Return Regex.Match(number, "^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d$").Success AndAlso number.Length > 5
+    End Function
+
+    Private Shared Function IsValidTransactionId(transactionId As String) As Boolean
+        Return Regex.Match(transactionId, "^ATPid_.*$").Success AndAlso transactionId.Length > 7
+    End Function
+
+    Private Shared Function IsValidToken(token As String) As Boolean
+        Return Regex.Match(token, "^CkTkn_.*$").Success AndAlso token.Length > 7
+    End Function
+
+    Private Shared Function IsValidCurrency(isoCurrency As String, ByRef symbol As String) As Boolean
+        symbol = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(Function(c) Not c.IsNeutralCulture).Select(Function(culture)
+                                                                                                                        Try
+                                                                                                                            Return New RegionInfo(culture.LCID)
+                                                                                                                        Catch
+                                                                                                                            Return Nothing
+                                                                                                                        End Try
+                                                                                                                    End Function).Where(Function(ri) ri IsNot Nothing AndAlso ri.ISOCurrencySymbol = isoCurrency).Select(Function(ri) ri.CurrencySymbol).FirstOrDefault()
+        Return symbol IsNot Nothing
+    End Function
+
+    ' End Regex and Validators
+
+    ' Process Handlers
+
+    Private Function ProcessBankTransfer(transfer As BankTransfer, ByVal url As String) As String
+        Dim transferClient = New HttpClient()
+        Dim content As HttpContent = New StringContent(transfer.ToString(), Encoding.UTF8, "application/json")
+        transferClient.DefaultRequestHeaders.Add("apiKey", _apikey)
+        Dim transferResult = transferClient.PostAsync(BankTransferUrl, content).Result
+        transferResult.EnsureSuccessStatusCode()
+        Dim transferRes = transferResult.Content.ReadAsStringAsync().Result
+        Return transferRes
+    End Function
+
+
+    Private Function Post(body As RequestBody, url As String) As String
+        Dim httpClient = New HttpClient()
+        Dim httpContent As HttpContent = New StringContent(body.ToString(), Encoding.UTF8, "application/json")
+        httpClient.DefaultRequestHeaders.Add("apiKey", _apikey)
+        Dim result = httpClient.PostAsync(url, httpContent).Result
+        result.EnsureSuccessStatusCode()
+        Dim postResult As String = result.Content.ReadAsStringAsync().Result
+
+        Dim jsonOutput As String
+        jsonOutput = JsonConvert.SerializeObject(postResult)
+        Return jsonOutput
+
+    End Function
+
     Private Function SendPostRequest(dataMap As Hashtable, urlString As String) As String
         Try
             Dim dataStr As String = ""
@@ -313,24 +423,6 @@ Public Class AfricasTalkingGateway
         Return jsonOutput
     End Function
 
-    Public Function InitiateMobilePaymentCheckout(productName As String, phoneNumber As String, currencyCode As String, amount As Integer, providerChannel As String, Optional _
-                                                     ByVal metadata As Dictionary(Of String, String) = Nothing) As String
-
-        Try
-            Return PostAsJson(New CheckoutData() With {
-            .Username = _username,
-            .ProductName = productName,
-            .PhoneNumber = phoneNumber,
-            .CurrencyCode = currencyCode,
-            .Amount = amount,
-            .ProviderChannel = providerChannel,
-            .Metadata = metadata
-        }, PaymentsUrlString)
-        Catch checkoutException As Exception
-            Throw New AfricasTalkingGatewayException("There was a problem processing Mobile Checkout: " & checkoutException.Message)
-        End Try
-    End Function
-
     Private Function PostB2BJson(dataMap As B2BData, url As String) As String
         Dim client = New HttpClient()
         Dim serializedB2B As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
@@ -340,48 +432,6 @@ Public Class AfricasTalkingGateway
         Dim stringResult As String = result.Content.ReadAsStringAsync().Result
         Dim jsonOutput As String
         jsonOutput = JsonConvert.SerializeObject(stringResult)
-        Return jsonOutput
-
-    End Function
-
-    Public Function MobileB2B(productName As String, provider As String, transferType As String, currencyCode As String, amount As Integer, destinationChannel As String, destinationAccount As String, Optional ByVal metadata As Dictionary(Of String, String) = Nothing) As String
-
-        Try
-            Return PostB2BJson(dataMap:=New B2BData() With {
-            .Username = _username,
-            .ProductName = productName,
-            .Provider = provider,
-            .TransferType = transferType,
-            .CurrencyCode = currencyCode,
-            .Amount = amount,
-            .DestinationChannel = destinationChannel,
-            .DestinationAccount = destinationAccount,
-            .Metadata = metadata
-        }, url:=PaymentsB2BUrlString)
-        Catch mobileB2BException As Exception
-            Throw New AfricasTalkingGatewayException("There was a problem processing Mobile B2B Request: " & mobileB2BException.Message)
-        End Try
-    End Function
-
-    Public Function MobilePaymentB2CRequest(productName As String, recipients As IList(Of MobilePaymentB2CRecipient)) As String
-
-        Return Post(New RequestBody With {
-            .ProductName = productName,
-            .UserName = _username,
-            .Recipients = recipients.ToList()
-        }, PaymentsB2CUrlString)
-    End Function
-
-    Private Function Post(body As RequestBody, url As String) As String
-        Dim httpClient = New HttpClient()
-        Dim httpContent As HttpContent = New StringContent(body.ToString(), Encoding.UTF8, "application/json")
-        httpClient.DefaultRequestHeaders.Add("apiKey", _apikey)
-        Dim result = httpClient.PostAsync(url, httpContent).Result
-        result.EnsureSuccessStatusCode()
-        Dim postResult As String = result.Content.ReadAsStringAsync().Result
-
-        Dim jsonOutput As String
-        jsonOutput = JsonConvert.SerializeObject(postResult)
         Return jsonOutput
 
     End Function
