@@ -450,4 +450,46 @@ Public Class AfricasTalkingGateway
         End Get
     End Property
 
+    Private ReadOnly Property CardOtpValidationUrl() As String
+        Get
+            Return PaymentHost & "/card/checkout/validate"
+        End Get
+    End Property
+
+    Private ReadOnly Property CardCheckoutUrl() As String
+        Get
+            Return PaymentHost & "/card/checkout/charge"
+        End Get
+    End Property
+
+    Private ReadOnly Property BankCheckoutUrl() As String
+        Get
+            Return PaymentHost & "/bank/checkout/charge"
+        End Get
+    End Property
+
+    Private ReadOnly Property BankOtpValidationUrl() As String
+        Get
+            Return PaymentHost & "/bank/checkout/validate"
+        End Get
+    End Property
+
+    Private ReadOnly Property BankTransferUrl() As String
+        Get
+            Return PaymentHost & "/bank/transfer"
+        End Get
+    End Property
+
+    Private ReadOnly Property TokenCreateUrl() As String
+        Get
+            Return ApiHost & "/checkout/token/create"
+        End Get
+    End Property
+
+    Private ReadOnly Property UssdPushUrl() As String
+        Get
+            Return ApiHost & "/ussd/push/request"
+        End Get
+    End Property
+
 End Class
