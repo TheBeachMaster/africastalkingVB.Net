@@ -436,18 +436,47 @@ Public Class AfricasTalkingGateway
 
     ' End Regex and Validators
 
-    ' Process Handlers
+    ' Processes
 
-    Private Function ProcessBankTransfer(transfer As BankTransfer, ByVal url As String) As String
+    Private Function ProcessBankTransfer(transfer As BankTransfer, url As String) As String
         Dim transferClient = New HttpClient()
         Dim content As HttpContent = New StringContent(transfer.ToString(), Encoding.UTF8, "application/json")
         transferClient.DefaultRequestHeaders.Add("apiKey", _apikey)
-        Dim transferResult = transferClient.PostAsync(BankTransferUrl, content).Result
+        Dim transferResult = transferClient.PostAsync(url, content).Result
         transferResult.EnsureSuccessStatusCode()
         Dim transferRes = transferResult.Content.ReadAsStringAsync().Result
         Return transferRes
     End Function
 
+    Private Function ProcessBankCheckout(bankCheckout As BankCheckout, url As String) As String
+        Dim bankCheckoutClient = New HttpClient()
+        Dim bankCheckoutContent As HttpContent = New StringContent(bankCheckout.ToString(), Encoding.UTF8, "application/json")
+        bankCheckoutClient.DefaultRequestHeaders.Add("apiKey", _apikey)
+        Dim bankCheckoutResult = bankCheckoutClient.PostAsync(url, bankCheckoutContent).Result
+        bankCheckoutResult.EnsureSuccessStatusCode()
+        Dim bankCheckoutRes = bankCheckoutResult.Content.ReadAsStringAsync().Result
+        Return bankCheckoutRes
+    End Function
+
+    Private Function ProcessCardCheckout(cardDetails As CardDetails, cardCkUrl As String) As String
+        Dim cardCheckoutClient = New HttpClient()
+        Dim cardCheckoutContent As HttpContent = New StringContent(cardDetails.ToString(), Encoding.UTF8, "application/json")
+        cardCheckoutClient.DefaultRequestHeaders.Add("apiKey", _apikey)
+        Dim cardCheckoutResult = cardCheckoutClient.PostAsync(cardCkUrl, cardCheckoutContent).Result
+        cardCheckoutResult.EnsureSuccessStatusCode()
+        Dim checkoutResult = cardCheckoutResult.Content.ReadAsStringAsync().Result
+        Return checkoutResult
+    End Function
+
+    Private Function ProcessOtp(otp As OTP, otpUrl As String) As String
+        Dim otpClient = New HttpClient()
+        Dim otpContent As HttpContent = New StringContent(otp.ToString(), Encoding.UTF8, "application/json")
+        otpClient.DefaultRequestHeaders.Add("apiKey", _apikey)
+        Dim otpResult = otpClient.PostAsync(otpUrl, otpContent).Result
+        otpResult.EnsureSuccessStatusCode()
+        Dim otpRes = otpResult.Content.ReadAsStringAsync().Result
+        Return otpRes
+    End Function
 
     Private Function Post(body As RequestBody, url As String) As String
         Dim httpClient = New HttpClient()
