@@ -29,52 +29,61 @@ Public Class AfricasTalkingGateway
         End If
     End Sub
 
+    Public Sub New()
+    End Sub
+
     'Change the debug flag to true to view the full response
     Private DEBUG As Boolean = False
     Private _responseCode As Integer
 
 
     Public Function SendMessage([to] As String, message As String, Optional ByVal recipient As String = Nothing, Optional ByVal bulkSmsMode As Integer = 1, Optional ByVal options As Hashtable = Nothing) As String
-        Dim data As New Hashtable()
-        data("username") = _username
-        data("to") = [to]
-        data("message") = message
 
-        If recipient IsNot Nothing Then
-            data("from") = recipient
-            data("bulkSMSMode") = Convert.ToString(bulkSmsMode)
+        Dim numbers() As String = [to].Split(separator:={","c}, options:=StringSplitOptions.RemoveEmptyEntries)
+        Dim isValidphoneNumber = IsPhoneNumber(numbers)
+        If [to].Length = 0 OrElse message.Length = 0 OrElse Not isValidphoneNumber Then
+            Throw New AfricasTalkingGatewayException("The message is either empty or phone number(s) is not valid")
+        Else
+            Dim data As New Hashtable()
+                data("username") = _username
+                data("to") = [to]
+                data("message") = message
 
-            If options IsNot Nothing Then
-                If options.Contains("keyword") Then
-                    data("keyword") = options("keyword")
-                End If
+            If recipient IsNot Nothing Then
+                data("from") = recipient
+                data("bulkSMSMode") = Convert.ToString(bulkSmsMode)
 
-                If options.Contains("linkId") Then
-                    data("linkId") = options("linkId")
-                End If
+                If options IsNot Nothing Then
+                    If options.Contains("keyword") Then
+                        data("keyword") = options("keyword")
+                    End If
 
-                If options.Contains("enqueue") Then
-                    data("enqueue") = options("enqueue")
-                End If
+                    If options.Contains("linkId") Then
+                        data("linkId") = options("linkId")
+                    End If
 
-                If options.Contains("retryDurationInHours") Then
-                    data("retryDurationInHours") = options("retryDurationInHours")
+                    If options.Contains("enqueue") Then
+                        data("enqueue") = options("enqueue")
+                    End If
+
+                    If options.Contains("retryDurationInHours") Then
+                        data("retryDurationInHours") = options("retryDurationInHours")
+                    End If
                 End If
             End If
-        End If
-
-        Dim response As String = SendPostRequest(data, SmsUrlString)
-        If _responseCode = CInt(HttpStatusCode.Created) Then
-            Dim json As String = JsonConvert.DeserializeObject(Of String)(response)
-            Dim recipients As String = json
-            If recipients.Length > 0 Then
-                Return recipients
+            Dim response As String = SendPostRequest(data, SmsUrlString)
+            If _responseCode = CInt(HttpStatusCode.Created) Then
+                Dim json As String = JsonConvert.DeserializeObject(Of String)(response)
+                Dim recipients As String = json
+                If recipients.Length > 0 Then
+                    Return recipients
+                End If
+                Throw New AfricasTalkingGatewayException("An error ocurred during this process")
             End If
-            Throw New AfricasTalkingGatewayException("An error ocurred during this process")
-
+            Throw New AfricasTalkingGatewayException(response)
         End If
-        Throw New AfricasTalkingGatewayException(response)
     End Function
+
 
     Public Function FetchMessages(ByVal lastReceivedId As Integer) As String
         Dim url As String = SmsUrlString & "?username=" & _username & "&lastReceivedId=" & Convert.ToString(lastReceivedId)
