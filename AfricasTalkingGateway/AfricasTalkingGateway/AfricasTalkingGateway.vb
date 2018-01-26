@@ -10,6 +10,8 @@ Imports System.Text.RegularExpressions
 Imports System.Web
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
+Imports Enumerable = System.Linq.Enumerable
+
 Public Class AfricasTalkingGateway
     Private ReadOnly _username As String
     Private ReadOnly _apikey As String
@@ -432,6 +434,10 @@ Public Class AfricasTalkingGateway
         Return Regex.Match(token, "^CkTkn_.*$").Success AndAlso token.Length > 7
     End Function
 
+    Private Shared Function IsValidProductName(productName As String) As Boolean
+        Return productName.Length > 0
+    End Function
+
     Private Shared Function IsValidCurrency(isoCurrency As String, ByRef symbol As String) As Boolean
         symbol = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(Function(c) Not c.IsNeutralCulture).Select(Function(culture)
                                                                                                                         Try
@@ -494,11 +500,9 @@ Public Class AfricasTalkingGateway
         Dim result = httpClient.PostAsync(url, httpContent).Result
         result.EnsureSuccessStatusCode()
         Dim postResult As String = result.Content.ReadAsStringAsync().Result
-
         Dim jsonOutput As String
         jsonOutput = JsonConvert.SerializeObject(postResult)
         Return jsonOutput
-
     End Function
 
     Private Function SendPostRequest(dataMap As Hashtable, urlString As String) As String
@@ -613,7 +617,6 @@ Public Class AfricasTalkingGateway
     Private Function PostAsJson(dataMap As CheckoutData, url As String) As String
         Dim client = New HttpClient()
         Dim contentPost As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
-        ' Complex object
         client.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim result = client.PostAsync(url, contentPost).Result
         result.EnsureSuccessStatusCode()
