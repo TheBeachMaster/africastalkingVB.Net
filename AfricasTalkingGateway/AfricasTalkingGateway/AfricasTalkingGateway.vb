@@ -10,7 +10,6 @@ Imports System.Text.RegularExpressions
 Imports System.Web
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
-Imports Enumerable = System.Linq.Enumerable
 
 Public Class AfricasTalkingGateway
     Private ReadOnly _username As String
@@ -423,7 +422,12 @@ Public Class AfricasTalkingGateway
     ' Regex and Validators
 
     Private Shared Function IsPhoneNumber(number() As String) As Boolean
-        Return Enumerable.Aggregate(Of Object, Boolean)((From num In number Select Regex.Match(num, "^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d{5,}$").Success), True, Function(current, status) current And status)
+        Dim valid As Boolean = True
+        For Each num As String In number
+            Dim status = Regex.Match(num, "^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d{5,}$").Success
+            valid = valid And status
+        Next num
+        Return valid
     End Function
 
     Private Shared Function IsValidTransactionId(transactionId As String) As Boolean
