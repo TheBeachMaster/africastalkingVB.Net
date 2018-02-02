@@ -91,12 +91,12 @@ Public Class AfricasTalkingGateway
         Dim response As String = SendGetRequest(url)
         If _responseCode = CInt(HttpStatusCode.OK) Then
             Dim json As String = JsonConvert.DeserializeObject(response)
-            Return json("SMSMessageData")
+            Return json
         End If
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Public Function CreateSubscription(phoneNumber As String, shortCode As String, keyword As String) As String
+    Public Function CreateSubscription(phoneNumber As String, shortCode As String, keyword As String, checkoutToken As String) As String
         If phoneNumber.Length = 0 OrElse shortCode.Length = 0 OrElse keyword.Length = 0 Then
             Throw New AfricasTalkingGatewayException("Please supply phone number, short code and keyword")
         End If
