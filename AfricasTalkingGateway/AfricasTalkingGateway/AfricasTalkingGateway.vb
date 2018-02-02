@@ -105,6 +105,7 @@ Public Class AfricasTalkingGateway
         data("phoneNumber") = phoneNumber
         data("shortCode") = shortCode
         data("keyword") = keyword
+        data("checkoutToken") = checkoutToken
         Dim urlString As String = SubscriptionUrlString & "/create"
         Dim response As String = SendPostRequest(data, urlString)
         If _responseCode = CInt(HttpStatusCode.Created) Then
