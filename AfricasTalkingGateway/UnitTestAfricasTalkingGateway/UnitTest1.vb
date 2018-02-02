@@ -1,4 +1,6 @@
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Namespace UnitTestAfricasTalkingGateway
     <TestClass>
@@ -20,12 +22,47 @@ Namespace UnitTestAfricasTalkingGateway
         End Sub
 
         <TestMethod()>
-        Public Sub TestBulkSmsMode()
+        Public Sub TestBulkSms()
             Dim message As String = "This is a bulk SMS message"
-            Dim recipients As String = "+254724587654,+254791854473,+254712965433"
+            Dim recipients As String = "+254714587654,+254791854473,+254712965433"
             Dim result As String = _gateway.SendMessage(recipients, message)
             ' Let's ensure we can send bulk sms to comma separated numbers
-            Dim bulkSmsStatus
+            Dim bulkSmsStatus As Boolean = result.Contains("Success")
+            Assert.IsTrue(bulkSmsStatus)
+        End Sub
+
+        <TestMethod()>
+        Public Sub TestFetchMessages()
+            Dim receivedId As Integer = 0
+            Dim result As String = _gateway.FetchMessages(receivedId)
+            ' Fetch messages should contain IDs or SMSMessageData (if empty)
+            Dim messageIds As Boolean = result.Contains("SMSMessageData")
+            Assert.IsTrue(messageIds)
+        End Sub
+
+        <TestMethod()>
+        Public Sub TestTokenCreation()
+            Dim phoneNumber As String = "+254724587654"
+            Dim tokenResult As String = _gateway.CreateCheckoutToken(phoneNumber)
+            ' Expect a success message 
+            Dim tokenStatus As Boolean = tokenResult.Contains("Success")
+            Assert.IsTrue(tokenStatus)
+        End Sub
+
+        <TestMethod()>
+        Public Sub TestCreateSubscription()
+            Dim phoneNumber As String = "+254724587654"
+            Dim shortcode As String = "44005"
+            Dim keyword As String = "coolguy"
+            Dim token As String = "CkTkn_860f9ee9-fb1e-4322-b1f4-7e0c1d00b12c"
+            Dim result As String = _gateway.CreateSubscription(phoneNumber, shortcode, keyword, token)
+            Dim resStatus As Boolean = result.Contains("Success")
+            Assert.IsTrue(resStatus)
+        End Sub
+
+        <TestMethod()>
+        Public Sub TestAirtimeService()
+            Dim phoneNumber As String = "+254714587654,+254791854473,+254712965433"
         End Sub
     End Class
 End Namespace
