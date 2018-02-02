@@ -205,17 +205,17 @@ Public Class AfricasTalkingGateway
         Throw New AfricasTalkingGatewayException(response)
     End Function
 
-    Public Function CreateCheckoutToken(ByVal phoneNumber As String) As String
-        Dim numbers() As String = phoneNumber.Split(separator:={","c}, options:=StringSplitOptions.RemoveEmptyEntries)
-        If Not IsPhoneNumber(numbers) Then
+    Public Function CreateCheckoutToken(phoneNumber As String) As String
+        Dim status = Regex.Match(phoneNumber, "^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d{5}$").Success
+        If Not status Then
             Throw New AfricasTalkingGatewayException("The phone number supplied is not valid")
         Else
             Try
                 Dim payload = New Hashtable()
                 payload("phoneNumber") = phoneNumber
                 Dim response = SendPostRequest(payload, TokenCreateUrl)
-                Dim tokenRes As String = JObject.Parse(response)
-                Return tokenRes
+                ' Dim tokenRes As String = JObject.Parse(response)
+                Return response
             Catch e As AfricasTalkingGatewayException
                 Throw New AfricasTalkingGatewayException("An error ocurred while creating this token: " & e.Message)
             End Try
