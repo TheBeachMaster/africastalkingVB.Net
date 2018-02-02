@@ -1,6 +1,4 @@
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports Newtonsoft.Json
-Imports Newtonsoft.Json.Linq
 
 Namespace UnitTestAfricasTalkingGateway
     <TestClass>
@@ -61,8 +59,33 @@ Namespace UnitTestAfricasTalkingGateway
         End Sub
 
         <TestMethod()>
-        Public Sub TestAirtimeService()
-            Dim phoneNumber As String = "+254714587654,+254791854473,+254712965433"
+        Public Sub TestAirtimeService() ' WIP
+            Dim airtimeData As New ArrayList
+            airtimeData.Add("'phoneNumber': '+254714587654','amount':'KES 250'")
+            airtimeData.Add("'phoneNumber':'+254791854473','amount':'KES 200'")
+            airtimeData.Add("'phoneNumber':'+254712965433','amount':'KES 100'")
+            Dim airtimeTransact As String = _gateway.SendAirtime(airtimeData)
+            Dim status As Boolean = airtimeTransact.Contains("Sent")
+            Assert.IsTrue(status)
+        End Sub
+
+        <TestMethod()>
+        Public Sub TestCallService()
+            Dim caller As String = "+254724587654"
+            'Dim recipients As String = "+254714587654,+254791854473,+254712965433"
+            Dim recipients As String = "+254714587654"
+            Dim callResult As String = _gateway.Call(caller, recipients)
+            Dim callStatus As Boolean = callResult.Contains("Queued")
+            Assert.IsTrue(callStatus)
+        End Sub
+
+        <TestMethod()>
+        Public Sub TestCallMultipleNumbers()
+            Dim caller As String = "+254724587654"
+            Dim recipients As String = "+254714587654,+254791854473,+254712965433"
+            Dim callResult As String = _gateway.Call(caller, recipients)
+            Dim callStatus As Boolean = callResult.Contains("Queued")
+            Assert.IsTrue(callStatus)
         End Sub
     End Class
 End Namespace
