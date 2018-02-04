@@ -13,7 +13,7 @@ Public Class DataResult
     <JsonProperty("totalTransactionFee")>
     Public Property TotalTransactionFee() As String
 
-    Public Overrides Function ToString() As String
+    Public Function ToJson() As String
         Dim result As String = JsonConvert.SerializeObject(Me)
         Return result
     End Function

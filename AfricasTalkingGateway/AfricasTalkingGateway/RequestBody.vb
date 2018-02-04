@@ -13,7 +13,7 @@ Public Class RequestBody
     <JsonProperty("recipients")>
     Public Property Recipients() As List(Of MobilePaymentB2CRecipient)
 
-    Public Overrides Function ToString() As String
+    Public Function ToJson() As String
         Dim json As String = JsonConvert.SerializeObject(Me)
         Return json
     End Function

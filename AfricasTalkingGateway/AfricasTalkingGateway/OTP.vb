@@ -9,5 +9,10 @@ Partial Public Class OTP
 
     <JsonProperty("username")>
     Public Property Username() As String
+
+    Public Function ToJson() As String
+        Dim json As String = JsonConvert.SerializeObject(Me)
+        Return json
+    End Function
 End Class
 
