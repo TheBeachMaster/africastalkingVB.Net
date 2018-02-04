@@ -249,9 +249,8 @@ Public Class AfricasTalkingGateway
                                                      ByVal metadata As Dictionary(Of String, String) = Nothing) As String
 
         Dim symbol As String = Nothing
-        Dim numbers() As String = phoneNumber.Split(separator:={","c}, options:=StringSplitOptions.RemoveEmptyEntries)
-
-        If IsValidProductName(productName) OrElse Not IsPhoneNumber(numbers) OrElse Not IsValidCurrency(currencyCode, symbol) OrElse providerChannel.Length = 0 Then
+        Dim status = Regex.Match(phoneNumber, "^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d{5}$").Success
+        If Not IsValidProductName(productName) OrElse Not status OrElse Not IsValidCurrency(currencyCode, symbol) OrElse providerChannel.Length = 0 Then
             Throw New AfricasTalkingGatewayException("Missing or malformed arguments :  invalid currency symbol or phonenumber or product name")
         End If
         Try
