@@ -87,6 +87,23 @@ Namespace UnitTestAfricasTalkingGateway
             Dim callStatus As Boolean = callResult.Contains("Queued")
             Assert.IsTrue(callStatus)
         End Sub
+
+        <TestMethod()>
+        Public Sub TestMobileCheckout()
+            Dim productName As String = "coolproduct"
+            Dim phoneNumber As String = "+254724587654"
+            Dim amount As Decimal = 30853
+            Dim channel As String = "mychannel"
+            Dim currency As String = "KES"
+            Dim metadata As Dictionary(Of String, String) = New Dictionary(Of String, String) From
+            {
+                {"reason", "test reason"}
+            }
+            Dim mobileChckoutResult As String = _gateway.InitiateMobilePaymentCheckout(productName, phoneNumber, currency, amount, channel, metadata)
+            Dim mobileCheckoutStatus As Boolean = mobileChckoutResult.Contains("PendingConfirmation")
+            Assert.IsTrue(mobileCheckoutStatus)
+        End Sub
+
     End Class
 End Namespace
 
