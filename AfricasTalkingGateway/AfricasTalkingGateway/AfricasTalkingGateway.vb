@@ -177,10 +177,12 @@ Public Class AfricasTalkingGateway
         End If
     End Sub
 
-    Public Function SendAirtime(recipient As ArrayList) As String
+    Public Function SendAirtime(recipients As ArrayList) As String
         Dim urlString As String = AirtimeUrlString & "/send"
-        Dim recipientJson As String = JsonConvert.SerializeObject(recipient)
-        Dim data = New Hashtable From {{"username", _username}, {"recipients", recipientJson}}
+        'Dim recipientsData As String = JsonConvert.SerializeObject(recipients, Formatting.None, New JsonSerializerSettings With {.NullValueHandling = NullValueHandling.Ignore, .Formatting = Formatting.Indented})
+        'Dim recipientJson As String = JsonConvert.DeserializeObject(Of String)(recipientsData)
+        Dim rec As String = JsonConvert.DeserializeObject(Of String)(recipients.ToArray().ToString())
+        Dim data = New Hashtable From {{"username", _username}, {"recipients", rec}}
         Try
             If _responseCode <> CInt(Math.Truncate(HttpStatusCode.Created)) Then
                 Throw New AfricasTalkingGatewayException(SendPostRequest(dataMap:=data, urlString:=urlString))
@@ -265,9 +267,9 @@ Public Class AfricasTalkingGateway
         End Try
     End Function
 
-    Public Function MobileB2B(productName As String, provider As String, transferType As String, currencyCode As String, amount As Integer, destinationChannel As String, destinationAccount As String, Optional ByVal metadata As Dictionary(Of String, String) = Nothing) As String
+    Public Function MobileB2B(productName As String, provider As String, transferType As String, currencyCode As String, amount As Decimal, destinationChannel As String, destinationAccount As String, Optional ByVal metadata As Dictionary(Of String, String) = Nothing) As String
         Dim cSym As String = Nothing
-        If IsValidProductName(productName) OrElse provider.Length = 0 OrElse transferType.Length = 0 OrElse Not IsValidCurrency(currencyCode, cSym) OrElse destinationAccount.Length = 0 OrElse destinationChannel.Length = 0 Then
+        If Not IsValidProductName(productName) OrElse provider.Length = 0 OrElse transferType.Length = 0 OrElse Not IsValidCurrency(currencyCode, cSym) OrElse destinationAccount.Length = 0 OrElse destinationChannel.Length = 0 Then
             Throw New AfricasTalkingGatewayException("Invalid arguments")
         End If
 
@@ -306,7 +308,7 @@ Public Class AfricasTalkingGateway
     End Function
 
     Public Function BankTransfer(productName As String, recipients As IEnumerable(Of BankTransferRecipients)) As String
-        If IsValidProductName(productName) Then
+        If Not IsValidProductName(productName) Then
             Throw New AfricasTalkingGatewayException("Not a valid product name")
         End If
 
@@ -329,11 +331,11 @@ Public Class AfricasTalkingGateway
         If IsValidProductName(productName) <> 0 AndAlso IsValidCurrency(currencyCode, curSym) AndAlso narration.Length <> 0 Then
             Dim bankCheckoutData = New BankCheckout() With {
                     .Username = _username,
-                    .productName = productName,
-                    .currencyCode = currencyCode,
-                    .amount = amount,
-                    .narration = narration,
-                    .bankAccount = bankAccount
+                    .ProductName = productName,
+                    .CurrencyCode = currencyCode,
+                    .Amount = amount,
+                    .Narration = narration,
+                    .BankAccount = bankAccount
                     }
             If metadata IsNot Nothing Then
                 bankCheckoutData.Metadata = metadata
@@ -456,7 +458,8 @@ Public Class AfricasTalkingGateway
 
     Private Function ProcessBankTransfer(transfer As BankTransfer, url As String) As String
         Dim transferClient = New HttpClient()
-        Dim content As HttpContent = New StringContent(transfer.ToString(), Encoding.UTF8, "application/json")
+        Dim tranferPayload As String = transfer.ToJson()
+        Dim content As HttpContent = New StringContent(tranferPayload, Encoding.UTF8, "application/json")
         transferClient.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim transferResult = transferClient.PostAsync(url, content).Result
         transferResult.EnsureSuccessStatusCode()
@@ -466,7 +469,8 @@ Public Class AfricasTalkingGateway
 
     Private Function ProcessBankCheckout(bankCheckout As BankCheckout, url As String) As String
         Dim bankCheckoutClient = New HttpClient()
-        Dim bankCheckoutContent As HttpContent = New StringContent(bankCheckout.ToString(), Encoding.UTF8, "application/json")
+        Dim checkoutPayload As String = bankCheckout.ToJson()
+        Dim bankCheckoutContent As HttpContent = New StringContent(checkoutPayload, Encoding.UTF8, "application/json")
         bankCheckoutClient.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim bankCheckoutResult = bankCheckoutClient.PostAsync(url, bankCheckoutContent).Result
         bankCheckoutResult.EnsureSuccessStatusCode()
@@ -476,7 +480,8 @@ Public Class AfricasTalkingGateway
 
     Private Function ProcessCardCheckout(cardDetails As CardDetails, cardCkUrl As String) As String
         Dim cardCheckoutClient = New HttpClient()
-        Dim cardCheckoutContent As HttpContent = New StringContent(cardDetails.ToString(), Encoding.UTF8, "application/json")
+        Dim cardCheckoutPayload As String = cardDetails.ToJson()
+        Dim cardCheckoutContent As HttpContent = New StringContent(cardCheckoutPayload, Encoding.UTF8, "application/json")
         cardCheckoutClient.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim cardCheckoutResult = cardCheckoutClient.PostAsync(cardCkUrl, cardCheckoutContent).Result
         cardCheckoutResult.EnsureSuccessStatusCode()
@@ -486,7 +491,8 @@ Public Class AfricasTalkingGateway
 
     Private Function ProcessOtp(otp As OTP, otpUrl As String) As String
         Dim otpClient = New HttpClient()
-        Dim otpContent As HttpContent = New StringContent(otp.ToString(), Encoding.UTF8, "application/json")
+        Dim otpPayload As String = otp.ToJson()
+        Dim otpContent As HttpContent = New StringContent(otpPayload, Encoding.UTF8, "application/json")
         otpClient.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim otpResult = otpClient.PostAsync(otpUrl, otpContent).Result
         otpResult.EnsureSuccessStatusCode()
@@ -496,7 +502,7 @@ Public Class AfricasTalkingGateway
 
     Private Function Post(body As RequestBody, url As String) As String
         Dim httpClient = New HttpClient()
-        Dim httpContent As HttpContent = New StringContent(body.ToString(), Encoding.UTF8, "application/json")
+        Dim httpContent As HttpContent = New StringContent(body.ToJson(), Encoding.UTF8, "application/json")
         httpClient.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim result = httpClient.PostAsync(url, httpContent).Result
         result.EnsureSuccessStatusCode()
@@ -628,9 +634,10 @@ Public Class AfricasTalkingGateway
         Return jsonOutput
     End Function
 
-    Private Function PostB2BJson(dataMap As B2BData, url As String) As String
+    Private Function PostB2BJson(b2BData As B2BData, url As String) As String
         Dim client = New HttpClient()
-        Dim serializedB2B As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
+        Dim b2BPayload As String = b2BData.ToJson()
+        Dim serializedB2B As HttpContent = New StringContent(b2BPayload, Encoding.UTF8, "application/json")
         client.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim result = client.PostAsync(url, serializedB2B).Result
         result.EnsureSuccessStatusCode()
