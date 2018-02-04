@@ -618,9 +618,10 @@ Public Class AfricasTalkingGateway
         End Try
     End Function
 
-    Private Function PostAsJson(dataMap As CheckoutData, url As String) As String
+    Private Function PostAsJson(checkoutData As CheckoutData, url As String) As String
         Dim client = New HttpClient()
-        Dim contentPost As HttpContent = New StringContent(dataMap.ToString(), Encoding.UTF8, "application/json")
+        Dim checkoutInfo As String = checkoutData.ToJson()
+        Dim contentPost As HttpContent = New StringContent(checkoutInfo, Encoding.UTF8, "application/json")
         client.DefaultRequestHeaders.Add("apiKey", _apikey)
         Dim result = client.PostAsync(url, contentPost).Result
         result.EnsureSuccessStatusCode()
