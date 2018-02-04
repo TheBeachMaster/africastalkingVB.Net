@@ -141,10 +141,7 @@ Public Class AfricasTalkingGateway
         Dim urlString As String = VoiceUrlString & "/call"
         Dim response As String = SendPostRequest(data, urlString)
         Dim json As String = JsonConvert.DeserializeObject(Of String)(response)
-        If CStr(json("errorMessage")) = "None" Then
-            Return json("entries")
-        End If
-        Throw New AfricasTalkingGatewayException(CType(json("errorMessage"), String))
+        Return json
     End Function
 
     Public Function GetNumQueuedCalls(phoneNumber As String, Optional ByVal queueName As String = Nothing) As Integer
