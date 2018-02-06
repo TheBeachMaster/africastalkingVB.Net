@@ -61,11 +61,16 @@ Namespace UnitTestAfricasTalkingGateway
 
         <TestMethod()>
         Public Sub TestAirtimeService() ' WIP
-            Dim airtimeData As New ArrayList
-            airtimeData.Add("'phoneNumber': '+254714587654','amount':'KES 250'")
-            airtimeData.Add("'phoneNumber':'+254791854473','amount':'KES 200'")
-            airtimeData.Add("'phoneNumber':'+254712965433','amount':'KES 100'")
-            Dim airtimeTransact As String = _gateway.SendAirtime(airtimeData)
+            Dim airtimeRecipientsList As New ArrayList()
+            Dim recipient1 As New Hashtable()
+            recipient1("phoneNumber") = "+254724587654"
+            recipient1("amount") = "KES 250"
+            Dim recipient2 As New Hashtable()
+            recipient2("phoneNumber") = "+25471458754"
+            recipient2("amount") = "KES YY"
+            airtimeRecipientsList.Add(recipient1)
+            airtimeRecipientsList.Add(recipient2)
+            Dim airtimeTransact As String = _gateway.SendAirtime(airtimeRecipientsList)
             Dim status As Boolean = airtimeTransact.Contains("Sent")
             Assert.IsTrue(status)
         End Sub
