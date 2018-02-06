@@ -179,19 +179,16 @@ Public Class AfricasTalkingGateway
 
     Public Function SendAirtime(recipients As ArrayList) As String
         Dim urlString As String = AirtimeUrlString & "/send"
-        'Dim recipientsData As String = JsonConvert.SerializeObject(recipients, Formatting.None, New JsonSerializerSettings With {.NullValueHandling = NullValueHandling.Ignore, .Formatting = Formatting.Indented})
-        'Dim recipientJson As String = JsonConvert.DeserializeObject(Of String)(recipientsData)
-        Dim rec As String = JsonConvert.DeserializeObject(Of String)(recipients.ToArray().ToString())
-        Dim data = New Hashtable From {{"username", _username}, {"recipients", rec}}
-        Try
-            If _responseCode <> CInt(Math.Truncate(HttpStatusCode.Created)) Then
-                Throw New AfricasTalkingGatewayException(SendPostRequest(dataMap:=data, urlString:=urlString))
-            End If
-            Dim response As String = JObject.Parse(SendPostRequest(dataMap:=data, urlString:=urlString))
-            Return response
-        Catch sendAirtimeException As AfricasTalkingGatewayException
-            Throw New AfricasTalkingGatewayException("Sending Airtime Encountered an errror: " & sendAirtimeException.Message)
-        End Try
+        Dim recipientsData As String = JsonConvert.SerializeObject(recipients)
+        Dim data As New Hashtable()
+        data("username") = _username
+        data("recipients") = recipientsData
+        Dim response As String = SendPostRequest(data, urlString)
+        If _responseCode = CInt(HttpStatusCode.Created) Then
+            Dim jsonResponse As String = JsonConvert.DeserializeObject(Of String)(response)
+            Return jsonResponse
+        End If
+        Throw New AfricasTalkingGatewayException(response)
     End Function
 
     Public Function GetUserData() As String
@@ -293,7 +290,7 @@ Public Class AfricasTalkingGateway
     End Function
 
     Public Function MobilePaymentB2CRequest(productName As String, recipients As IList(Of MobilePaymentB2CRecipient)) As String
-        If IsValidProductName(productName) Then
+        If Not IsValidProductName(productName) Then
             Throw New AfricasTalkingGatewayException("Malformed product name")
         End If
 
@@ -322,7 +319,7 @@ Public Class AfricasTalkingGateway
             Dim bankTransferRes = ProcessBankTransfer(transferDetails, BankTransferUrl)
             Return bankTransferRes
         Catch exception As Exception
-            Throw New AfricasTalkingGatewayException(exception)
+            Throw New AfricasTalkingGatewayException(exception.Message)
         End Try
     End Function
 
@@ -456,6 +453,7 @@ Public Class AfricasTalkingGateway
 
     ' Processes
 
+
     Private Function ProcessBankTransfer(transfer As BankTransfer, url As String) As String
         Dim transferClient = New HttpClient()
         Dim tranferPayload As String = transfer.ToJson()
@@ -523,7 +521,7 @@ Public Class AfricasTalkingGateway
                 dataStr &= HttpUtility.UrlEncode(key, Encoding.UTF8)
                 dataStr &= "=" & HttpUtility.UrlEncode(value, Encoding.UTF8)
             Next key
-
+            ' Debug Only
             Dim byteArray() As Byte = Encoding.UTF8.GetBytes(dataStr)
 
             ServicePointManager.ServerCertificateValidationCallback = AddressOf RemoteCertificateValidationCallback
