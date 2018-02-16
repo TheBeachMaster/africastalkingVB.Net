@@ -38,7 +38,7 @@ Public Class AfricasTalkingGateway
     Private _responseCode As Integer
 
 
-    Public Function SendMessage([to] As String, message As String, Optional ByVal recipient As String = Nothing, Optional ByVal bulkSmsMode As Integer = 1, Optional ByVal options As Hashtable = Nothing) As String
+    Public Function SendMessage([to] As String, message As String, Optional ByVal from As String = Nothing, Optional ByVal bulkSmsMode As Integer = 1, Optional ByVal options As Hashtable = Nothing) As String
 
         Dim numbers() As String = [to].Split(separator:={","c}, options:=StringSplitOptions.RemoveEmptyEntries)
         Dim isValidphoneNumber = IsPhoneNumber(numbers)
@@ -51,7 +51,7 @@ Public Class AfricasTalkingGateway
                 data("message") = message
 
             If recipient IsNot Nothing Then
-                data("from") = recipient
+                data("from") = from
                 data("bulkSMSMode") = Convert.ToString(bulkSmsMode)
 
                 If options IsNot Nothing Then
