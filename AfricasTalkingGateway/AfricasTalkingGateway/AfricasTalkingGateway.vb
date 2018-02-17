@@ -269,7 +269,7 @@ Public Class AfricasTalkingGateway
         If Not IsValidProductName(productName) OrElse provider.Length = 0 OrElse transferType.Length = 0 OrElse Not IsValidCurrency(currencyCode, cSym) OrElse destinationAccount.Length = 0 OrElse destinationChannel.Length = 0 Then
             Throw New AfricasTalkingGatewayException("Invalid arguments")
         End If
-
+        ' TBD Set provider as Athena if username is sandbox
         Dim btob = New B2BData With {
                 .Username = _username,
                 .ProductName = productName,

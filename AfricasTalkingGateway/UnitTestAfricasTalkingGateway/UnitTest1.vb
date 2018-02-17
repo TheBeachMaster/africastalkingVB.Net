@@ -60,14 +60,14 @@ Namespace UnitTestAfricasTalkingGateway
         End Sub
 
         <TestMethod()>
-        Public Sub TestAirtimeService() ' WIP
+        Public Sub TestAirtimeService() 
             Dim airtimeRecipientsList As New ArrayList()
             Dim recipient1 As New Hashtable()
             recipient1("phoneNumber") = "+254724587654"
             recipient1("amount") = "KES 250"
             Dim recipient2 As New Hashtable()
             recipient2("phoneNumber") = "+25471458754"
-            recipient2("amount") = "KES YY"
+            recipient2("amount") = "KES 3000"
             airtimeRecipientsList.Add(recipient1)
             airtimeRecipientsList.Add(recipient2)
             Dim airtimeTransact As String = _gateway.SendAirtime(airtimeRecipientsList)
@@ -127,6 +127,8 @@ Namespace UnitTestAfricasTalkingGateway
             Dim mobileB2BStatus As Boolean = b2BResult.Contains("Queued")
             Assert.IsTrue(mobileB2BStatus)
         End Sub
+ 
+ ' Test B2C
 
         <TestMethod()>
         Public Sub TestBankTransfer()
@@ -198,7 +200,8 @@ Namespace UnitTestAfricasTalkingGateway
             Dim cardCheckoutStatus As Boolean = checkoutRes.Contains("PendingValidation")
             Assert.IsTrue(cardCheckoutStatus)
         End Sub
-
+ 
+ '  TBD Test Bank OTP 
         <TestMethod()>
         Public Sub TestCardOtpValidation()
             Const transId As String = "ATPid_ee698c34c7d807ff55da8a9033dcfecd"
