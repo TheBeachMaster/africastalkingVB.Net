@@ -1,6 +1,9 @@
 ﻿Imports Newtonsoft.Json
 
 Public Class MobilePaymentB2CRecipient
+    <JsonProperty("name")>
+    Public Property Name() As String
+
     <JsonProperty("phoneNumber")>
     Public Property PhoneNumber() As String
 
@@ -13,7 +16,8 @@ Public Class MobilePaymentB2CRecipient
     <JsonProperty("metadata")>
     Public Property Metadata As Dictionary(Of String, String)
 
-    Public Sub New(phoneNumber As String, currencyCode As String, amount As Decimal)
+    Public Sub New(name As String, phoneNumber As String, currencyCode As String, amount As Decimal)
+        Me.Name = name
         Me.PhoneNumber = phoneNumber
         Me.CurrencyCode = currencyCode
         Me.Amount = amount
