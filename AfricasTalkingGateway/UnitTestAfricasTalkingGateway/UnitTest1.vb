@@ -1,5 +1,5 @@
+
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports Newtonsoft.Json
 
 Namespace UnitTestAfricasTalkingGateway
     <TestClass>
@@ -60,7 +60,7 @@ Namespace UnitTestAfricasTalkingGateway
         End Sub
 
         <TestMethod()>
-        Public Sub TestAirtimeService() 
+        Public Sub TestAirtimeService()
             Dim airtimeRecipientsList As New ArrayList()
             Dim recipient1 As New Hashtable()
             recipient1("phoneNumber") = "+254724587654"
@@ -127,8 +127,30 @@ Namespace UnitTestAfricasTalkingGateway
             Dim mobileB2BStatus As Boolean = b2BResult.Contains("Queued")
             Assert.IsTrue(mobileB2BStatus)
         End Sub
- 
- ' Test B2C
+
+        <TestMethod()>
+        Public Sub TestB2CPayments()
+            Dim productName As String = "awesomeproduct"
+            Dim currencyCode As String = "KES"
+            Dim rec1Num As String = "+254723881465"
+            Dim rec2Num As String = "+254724587654"
+            Dim rec1Name As String = "T'Challa"
+            Dim rec2Name As String = "Shuri"
+            Dim rec1Amount As Decimal = 15320
+            Dim rec2Amount As Decimal = 33500
+
+            Dim rec1 As MobilePaymentB2CRecipient = New MobilePaymentB2CRecipient(rec1Name, rec1Num, currencyCode, rec1Amount)
+            Dim rec2 As MobilePaymentB2CRecipient = New MobilePaymentB2CRecipient(rec2Name, rec2Num, currencyCode, rec2Amount)
+            rec2.AddMetadata("Reason", "Awesome Tech")
+            rec1.AddMetadata("Reason", "Saving the Kingdom")
+            Dim recList As IList(Of MobilePaymentB2CRecipient) = New List(Of MobilePaymentB2CRecipient) From
+                    {
+                    rec1, rec2
+                    }
+            Dim mobileB2Ctransaction As String = _gateway.MobilePaymentB2CRequest(productName, recList)
+            Dim isTransferInitiated As Boolean = mobileB2Ctransaction.Contains("Queued")
+            Assert.IsTrue(isTransferInitiated)
+        End Sub
 
         <TestMethod()>
         Public Sub TestBankTransfer()
