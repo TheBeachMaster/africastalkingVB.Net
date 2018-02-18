@@ -15,7 +15,7 @@ Take a look at the [API docs here](http://docs.africastalking.com/) for more inf
 
 + From the _command prompt/powershell window_ opened in your project directory, key in the following and press *Enter*. 
 ```powershell 
- dotnet add package AfricasTalking.NET.VB --version 2.1.0
+ dotnet add package AfricasTalking.NET.VB --version 2.1.1
 ```
 > Ensure you have the latest version of the package. Visit [Nuget](https://www.nuget.org/packages/AfricasTalking.NET.VB/) for more info on the latest release of this package. 
 
@@ -23,7 +23,7 @@ Take a look at the [API docs here](http://docs.africastalking.com/) for more inf
 
 + On your Nuget package manager console,key in the following and press *Enter* 
 ```powershell 
-Install-Package AfricasTalking.NET.VB -Version 2.1.0
+Install-Package AfricasTalking.NET.VB -Version 2.1.1
 ```
 > Ensure you have the latest version of the package. Visit [Nuget](https://www.nuget.org/packages/AfricasTalking.NET.VB/) for more info on the latest release of this package
 
