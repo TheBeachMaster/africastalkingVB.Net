@@ -6,10 +6,12 @@ The Africa's Talking VB.NET API wrapper provides convenient access to the Africa
 Take a look at the [API docs here](http://docs.africastalking.com/) for more information. 
 
 ## Installation Options
-1. #### Using Visual Studio IDE :TBD
+1. #### Using Visual Studio IDE 
+
+   #### Search for the latest version of `AfricasTalking.NET.VB` from the Nuget package manager window
 
 
-2. #### Using .NET CLI 
+2. ####  Using .NET CLI 
 
 + From the _command prompt/powershell window_ opened in your project directory, key in the following and press *Enter*. 
 ```powershell 
@@ -41,8 +43,8 @@ The package needs to be configured with your Africa's Talking username and API k
  Dim apikey As String = "apikey"
  ReadOnly _gateway As New AfricasTalkingGateway(username,apikey)
 
-``` 
- 
+```
+
 > Always ensure to register a callback URL with our services from the dashboard for you to receive various notifications posted by our API. 
 > Ensure that your callback url responds with an `OK` or `200` status on message receipt.
 
@@ -50,40 +52,40 @@ The package needs to be configured with your Africa's Talking username and API k
 
 #### [Sending SMS](http://docs.africastalking.com/sms/sending) 
 
-- `SendMessage(to,message,from,bulkSmsMode,options)` :  The following arguments are supplied to facilitate sending of messages via our APIs  
+- `SendMessage(to,message,sender,bulkSmsMode,options)` :  The following arguments are supplied to facilitate sending of messages via our APIs  
 
     - `to` : The recipient(s) expecting the message 
     - `message` : The SMS body. 
-    - `from` :  (`Optional`) The Short-code or Alphanumeric ID that is associated with an Africa's Talking account.  
+    - `sender` :  (`Optional`) The Short-code or Alphanumeric ID that is associated with an Africa's Talking account.  
     - `bulkSmsMode` (`Optional`) : This parameter will be used by the Mobile Service Provider to determine who gets  billed for a message sent using a Mobile-Terminated Short-code. Must be set to  *1*  for Bulk SMS. .
     - `options` :   (`Optional`). Passed as _key-value_ pairs 
         -   `enque` : This parameter is used for Bulk SMS clients that would like deliver as many messages to the API before waiting for an Ack from the Telcos. If enabled, the API will store the messages in its databases and send them out asynchronously after responding to the request 
         -   `keyword` : This parameter is used for premium services. It is essential for subscription premium services.
         -   `linkId` : This parameter is used for premium services to send OnDemand messages. We forward the linkId to your application when the user send a message to your service. (Essential for premium subscription services) 
         -   `retryDurationInHours` : This parameter is used for premium messages. It specifies the number of hours your subscription message should be retried in case it's not delivered to the subscriber. (Essential for premium subscription services)
- 
+
 ```vb 
   
 Dim message As String = "My message"
 Dim recipient As String = "+25NNNNNNNN"
 Dim results As String = _gateway.SendMessage(recipient, message)  
 
-```  
- 
+```
+
 ```vb 
 
 Dim message As String = "This is a bulk SMS message"
 Dim recipients As String = "+254714587654,+254791854473,+254712965433"
 Dim result As String = _gateway.SendMessage(recipients, message) 
 
-``` 
+```
 
 #### [Retrieving SMS](http://docs.africastalking.com/sms/fetchmessages)
 
 - `FetchMessages(lastReceivedId)` : Manually retrieve your messages.
 
     - `lastReceivedId` : This is the id of the message that you last processed. If this is your first call, pass in 0. `REQUIRED`
- 
+
 
 #### [Premium Subscriptions](http://docs.africastalking.com/subscriptions/create)
 
@@ -95,7 +97,7 @@ Dim result As String = _gateway.SendMessage(recipients, message)
     - `checkoutToken` :  This is a token used to validate the subscription request  `REQUIRED` 
 
      > If you have subscription products on your premium SMS short codes, you will need to configure a callback URL that we will send message payload to notifying you when users subscribe or unsubscribe from your products (currently supported on Safaricom).Visit [this link](http://docs.africastalking.com/subscriptions/callback) to learn more on how to setup a subscription callback  
- 
+
 
 
 ### [Airtime](http://docs.africastalking.com/airtime/sending) 
@@ -104,7 +106,7 @@ Dim result As String = _gateway.SendMessage(recipients, message)
     - `recipients`: Contains JSON objects containing the following keys
         - `phoneNumber`: Recipient of airtime
         - `amount`: Amount sent `>= 10 && <= 10K` with currency e.g `KES 100`
- 
+
 ```vb 
   
 Dim airtimeRecipientsList As New ArrayList()
@@ -118,8 +120,8 @@ airtimeRecipientsList.Add(recipient1)
 airtimeRecipientsList.Add(recipient2)
 Dim airtimeTransact As String = _gateway.SendAirtime(airtimeRecipientsList)  
 
-``` 
- 
+```
+
 ### [Payments](http://docs.africastalking.com/payments)
 
 > Mobile Consumer To Business (C2B) functionality allows your application to receive payments that are initiated by a mobile subscriber.
@@ -158,7 +160,7 @@ Dim metadata As Dictionary(Of String, String) = New Dictionary(Of String, String
             }
 Dim mobileChckoutResult As String = _gateway.InitiateMobilePaymentCheckout(productName, phoneNumber, currency, amount, channel, metadata)  
 
-```    
+```
 
 #### [B2C](http://docs.africastalking.com/payments/mobile-b2c)
 
@@ -170,12 +172,32 @@ Dim mobileChckoutResult As String = _gateway.InitiateMobilePaymentCheckout(produ
     - `recipients`: A list of **up to 10** recipients info and metadata. Each recipient has:
 
         - `phoneNumber`: The payee phone number (in international format; e.g. `+25471xxxxxxx`). `REQUIRED`
-
         - `currencyCode`: 3-digit ISO format currency code (e.g `KES`, `USD`, `UGX` etc.) `REQUIRED`
-
         - `amount`: Payment amount. `REQUIRED`
-
         - `metadata`: Some optional data to associate with transaction. 
+
+
+```vb
+            Dim productName As String = "awesomeproduct"
+            Dim currencyCode As String = "KES"
+            Dim rec1Num As String = "+254723881465"
+            Dim rec2Num As String = "+254724587654"
+            Dim rec1Name As String = "T'Challa"
+            Dim rec2Name As String = "Shuri"
+            Dim rec1Amount As Decimal = 15320
+            Dim rec2Amount As Decimal = 33500
+
+            Dim rec1 As MobilePaymentB2CRecipient = New MobilePaymentB2CRecipient(rec1Name, rec1Num, currencyCode, rec1Amount)
+            Dim rec2 As MobilePaymentB2CRecipient = New MobilePaymentB2CRecipient(rec2Name, rec2Num, currencyCode, rec2Amount)
+            rec2.AddMetadata("Reason", "Awesome Tech")
+            rec1.AddMetadata("Reason", "Saving the Kingdom")
+            Dim recList As IList(Of MobilePaymentB2CRecipient) = New List(Of MobilePaymentB2CRecipient) From
+                    {
+                    rec1, rec2
+                    }
+            Dim mobileB2Ctransaction As String = _gateway.MobilePaymentB2CRequest(productName, recList)
+```
+
 
 
 
@@ -238,7 +260,7 @@ Dim metadataDetails As Dictionary(Of String, String) = New Dictionary(Of String,
 Dim transferType As String = "BusinessToBusinessTransfer"
 Dim b2BResult As String = _gateway.MobileB2B(productName, provider, transferType, currencyCode, amount, destinationChannel, destinationAccount, metadataDetails)
 
-```    
+```
 
 #### [Banking - Checkout](http://docs.africastalking.com/bank/checkout)
 
@@ -274,8 +296,8 @@ Dim narration As String = "We're buying something cool"
 Dim receBank As BankAccount = New BankAccount(accountNumber, bankCode, dob, accountName)
 Dim res As String = _gateway.BankCheckout(productName, receBank, currencyCode, amount, narration, metadata)
 
-```            
- 
+```
+
 
 
 #### [Banking - Transfer](http://docs.africastalking.com/bank/transfer)
@@ -295,7 +317,7 @@ Dim res As String = _gateway.BankCheckout(productName, receBank, currencyCode, a
         - `amount` : This is the amount (in the provided currency) that the mobile subscriber is expected to confirm. 
         - `narration` : A short description of the transaction that can be displayed on the client's statement. 
         - `metadata` : This value contains a map of any metadata that you would like us to associate with this request. You can use this field to send data that will map notifications to checkout requests, since we will include it when we send notifications once the checkout is complete.
- 
+
  ```vb 
     
 Dim productname As String = "coolproduct"
@@ -322,10 +344,10 @@ Dim recipients As IList(Of BankTransferRecipients) = New List(Of BankTransferRec
                 }
 Dim bankTransferResults As String = _gateway.BankTransfer(productname, recipients)
 
-```  
- 
+ ```
 
-   
+
+
 
 #### OTP Validation [Banking](http://docs.africastalking.com/bank/validate) and [Card](http://docs.africastalking.com/card/validate) 
 > Checkout Validation APIs allow your application to validate bank/card charge requests that deduct money from a customer's bank account.
@@ -342,8 +364,8 @@ Dim bankTransferResults As String = _gateway.BankTransfer(productname, recipient
 - `OtpValidateBank(transactionId, otp)`: Bank Account checkout Validation APIs allow your application to validate bank charge requests that deduct money from a customer's bank account. [More info](http://docs.africastalking.com/bank/validate).
      - `transactionId` :This value identifies the transaction that your application wants to validate. This value is contained in the response  to the charge request. `REQUIRED`   
      - `otp` :  This contains the One Time Password that the card issuer sent to the client that owns the payment card. `REQUIRED`.  
-   
-    
+
+
 
 
 #### [Card Checkout](http://docs.africastalking.com/card/checkout)
@@ -384,5 +406,5 @@ Const validTillYear As Integer = 2019
 Dim cardDetails As PaymentCard = New PaymentCard(cardPin, countryCode, cardCvv, validTillMonth, validTillYear, cardNum)
 Dim checkoutRes As String = _gateway.CardCheckout(productName, cardDetails, currencyCode, amount, narration, metadata)   
 
-```       
-   
+```
+
