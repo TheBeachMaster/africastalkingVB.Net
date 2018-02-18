@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.1.0</Version>
+    <Version>2.1.1</Version>
     <PackageId>AfricasTalking.NET.VB</PackageId>
     <Authors>TheBeachmaster</Authors>
     <Company>Africa's Talking Ltd.</Company>
@@ -18,8 +18,7 @@
     <RepositoryType>Git</RepositoryType>
     <PackageTags>sms voice mobile-payments airtime card-payments bank-tranfers otp-validations</PackageTags>
     <PackageReleaseNotes>- Pest Control
-        - Fixes for payments (Banking, Card, (C/B)2(B/C))
-        - Fixes for Airtime</PackageReleaseNotes>
+        - Minor fixes for Mobile B2C</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
